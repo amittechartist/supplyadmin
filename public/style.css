@@ -1,0 +1,79 @@
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Define your custom styles */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.invoice-preview-wrapper {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.invoice-logo {
+    font-size: 24px;
+}
+
+.invoice-spacing {
+    margin-bottom: 10px;
+}
+
+.invoice-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.invoice-number {
+    color: #007bff;
+}
+
+.invoice-date-title {
+    font-weight: bold;
+}
+
+.invoice-date {
+    font-weight: bold;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.invoice-table th,
+.invoice-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.invoice-table th {
+    background-color: #f0f0f0;
+    text-align: left;
+}
+
+.invoice-total-wrapper {
+    text-align: right;
+}
+
+.invoice-total-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.invoice-total-title {
+    font-weight: bold;
+}
+.modal_show_data{
+    border: 1px solid #bfbfbf !important; 
+    border-radius: 7px !important;
+    padding: 5px 8px 5px 8px !important;
+}
+/* Add your additional styles as needed */
