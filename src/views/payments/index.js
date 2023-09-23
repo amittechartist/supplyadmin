@@ -99,7 +99,7 @@ const InvoiceList = () => {
       ifscCode: partyifsccode,
     });
 
-    
+
 
     const onsubmit = (e) => {
       e.preventDefault();
@@ -201,154 +201,10 @@ const InvoiceList = () => {
                 placeholder='Search Invoice'
               />
             </div>
-            <Button color='primary' onClick={() => { emptyField(); setShow(true) }}>
-              Add New
-            </Button>
-          </Col>
-          <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
-            <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
-            <ModalBody className='px-sm-5 mx-50 pb-5'>
-              <div className='text-center mb-2'>
-                <h1 className='mb-1'>Supplier Form</h1>
-              </div>
-              <form enctype="multipart/form-data" onSubmit={onsubmit}>
-                <Row className='gy-1 pt-75'>
-                  <Col xs={6}>
-                    <Label className='form-label' for='categoryname'>
-                      Party Name
-                    </Label>
-                    <input
-                      name='partyname' // Add a name prop to match your form structure if needed
-                      id='partyname'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyname}
-                      onChange={(e) => setpartyname(e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={6}>
-                    <Label className='form-label' for='categoryname'>
-                      Party Aadhar Number
-                    </Label>
-                    <input
-                      type='number'
-                      name='partyaadharnumber' // Add a name prop to match your form structure if needed
-                      id='partyaadharnumber'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyaadharnumber}
-                      onChange={(e) => setpartyaadharnumber(e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={6}>
-                    <Label className='form-label' for='categoryname'>
-                      Party Phone Number
-                    </Label>
-                    <input
-                      type='number'
-                      name='partyphonenumber' // Add a name prop to match your form structure if needed
-                      id='partyphonenumber'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyphonenumber}
-                      onChange={(e) => setpartyphonenumber(e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={6}>
-                    <Label className='form-label' for='categoryname'>
-                      Party Address
-                    </Label>
-                    <input
-                      name='partyaddress' // Add a name prop to match your form structure if needed
-                      id='partyaddress'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyaddress}
-                      onChange={(e) => setpartyaddress(e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={6}>
-                    <Label className='form-label' for='categoryname'>
-                      Remarks
-                    </Label>
-                    <input
-                      name='remarks' // Add a name prop to match your form structure if needed
-                      id='remarks'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={remarks}
-                      onChange={(e) => setremarks(e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={12}>
-                    <h3>Account details</h3>
-                  </Col>
-                  <Col xs={12}>
 
-                    {inputSets.map((inputSet, index) => (
-                      <Row key={index} className='mb-1'>
-                        <Col xs={5}>
-                          <input
-                            name='categoryname'
-                            id={`partyaccountnumber_${index}`}
-                            placeholder='Account Number'
-                            className='custom-input-class form-control'
-                            style={{ fontSize: '16px' }}
-                            value={inputSet.partyaccountnumber}
-                            onChange={(e) =>
-                              handleInputChange(index, 'partyaccountnumber', e.target.value)
-                            }
-                          />
-                        </Col>
-                        <Col xs={5}>
-                          <input
-                            name='categoryname'
-                            id={`partyifsccode_${index}`}
-                            placeholder='IFSC Code'
-                            className='custom-input-class form-control'
-                            style={{ fontSize: '16px' }}
-                            value={inputSet.partyifsccode}
-                            onChange={(e) =>
-                              handleInputChange(index, 'partyifsccode', e.target.value)
-                            }
-                          />
-                        </Col>
-                        <Col xs={2} className='d-flex align-baseline'>
-                          <Button
-                            type='button'
-                            className='me-1'
-                            color='danger'
-                            onClick={() => handleDeleteInputSet(index)}
-                          >
-                            -
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))}
-                  </Col>
-                  <Col xs={12} className='d-flex align-baseline'>
-                    <Button type='button' className='me-1' color='primary' onClick={handleAddInputSet}>
-                      Add Party Account Details
-                    </Button>
-                  </Col>
-                  <Col xs={12} className='text-center mt-2 pt-50'>
-                    <Button type='submit' className='me-1' color='primary'>
-                      Submit
-                    </Button>
-                    <Button type='reset' color='secondary' outline onClick={() => setShow(false)}>
-                      Discard
-                    </Button>
-                  </Col>
-                </Row>
-              </form>
-            </ModalBody>
-          </Modal>
+          </Col>
           
+
         </Row>
       </div>
     )
@@ -483,6 +339,20 @@ const InvoiceList = () => {
         );
       }
     },
+    {
+      name: 'Payment',
+      sortable: true,
+      minWidth: '150px',
+      sortField: 'pphoto.name',
+      // selector: row => row.client.name,
+      cell: row => {
+        return (
+          <div className='d-flex justify-content-left align-items-center'>
+            <Button color='success' onClick={() => { getpaymentdetails(row.id) }}>Payment</Button>
+          </div>
+        );
+      }
+    },
 
     {
       name: 'Action',
@@ -548,7 +418,14 @@ const InvoiceList = () => {
   const [partyaddress, setpartyaddress] = useState();
   const [remarks, setremarks] = useState();
   const [createddate, setcreateddate] = useState();
+  const [accountid, setAccountid] = useState();
+  const [amount, setAmount] = useState();
+  const [amountinword, setAmountinword] = useState();
   const [formaccount, setFormaccount] = useState([]);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [paymentOption, setPaymentOption] = useState(null);
+  const [selectpaymenttrpeid, setSelectpaymenttrpeid] = useState(null);
+
   function viewdetails(id) {
     fetch(local_api_url + 'supplier_form_get/' + id, {
       method: 'GET'
@@ -562,12 +439,159 @@ const InvoiceList = () => {
         setremarks(data.form_data.remark);
         setcreateddate(data.form_data.date);
         setFormaccount(data.form_accounts);
+        
         setInfoshow(true);
       })
       .catch(error => {
         console.error('Error deleting category:', error);
       });
   }
+  
+  const issuedata = (selectedValue) => {
+    setSelectedOption(selectedValue);
+    setAccountid(selectedValue.value);
+  };
+  const ispaymenttype = (selectedValue) => {
+    setPaymentOption(selectedValue);
+    setSelectpaymenttrpeid(selectedValue.value);
+  };
+  function getpaymentdetails(id) {
+
+    fetch(local_api_url + 'supplier_form_get_payment/' + id, {
+      method: 'GET'
+    })
+      .then(response => response.json())
+      .then(data => {
+        setpartyname(data.form_data.name);
+        setpartyaadharnumber(data.form_data.aadhar_no);
+        setpartyphonenumber(data.form_data.phone_number);
+        setpartyaddress(data.form_data.address);
+        setremarks(data.form_data.remark);
+        setcreateddate(data.form_data.date);
+        setFormaccount(data.form_accounts);
+        setShow(true);
+      })
+      .catch(error => {
+        console.error('Error deleting category:', error);
+      });
+
+  }
+  const groupedOptions = [
+    {
+      options: formaccount
+    }
+  ]
+  const paymenttype = [
+    {
+      options: [
+        {value : 1 , label : "Full Payment"},
+        {value : 2 , label : "Advance Payment"}
+      ]
+    }
+  ]
+
+  const ConvertNumberToWords = (num) => {
+    const units = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    const teens = ["", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+    const tens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    const thousands = ["", "thousand", "million", "billion", "trillion"];
+  
+    const capitalizeWord = (word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    };
+  
+    const convertChunk = (chunk) => {
+      let chunkStr = "";
+  
+      if (chunk >= 100) {
+        chunkStr += units[Math.floor(chunk / 100)] + " hundred ";
+        chunk %= 100;
+      }
+  
+      if (chunk >= 11 && chunk <= 19) {
+        chunkStr += teens[chunk - 10];
+      } else {
+        chunkStr += tens[Math.floor(chunk / 10)];
+        chunk %= 10;
+  
+        if (chunk > 0) {
+          chunkStr += " " + units[chunk];
+        }
+      }
+  
+      return chunkStr;
+    };
+  
+    if (num === 0) {
+      return "Zero";
+    }
+  
+    let result = "";
+    let chunkIndex = 0;
+  
+    while (num > 0) {
+      const chunk = num % 1000;
+      if (chunk > 0) {
+        const chunkStr = convertChunk(chunk);
+        result = capitalizeWord(chunkStr) + " "+ thousands[chunkIndex] + " " + result;
+      }
+      num = Math.floor(num / 1000);
+      chunkIndex++;
+    }
+  
+    return result.trim();
+  };
+  function Handelpaynow(){
+    console.log(partyname);
+    console.log(partyaadharnumber);
+    console.log(partyphonenumber);
+    console.log(accountid);
+    console.log(amount);
+    console.log(selectpaymenttrpeid);
+    if(!partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpaymenttrpeid){
+      toast.error("All field required");
+    }else{
+      const formdata = new FormData();
+    formdata.append('partyname', partyname);
+    formdata.append('partyaadharnumber', partyaadharnumber);
+    formdata.append('partyphonenumber', partyphonenumber);
+    formdata.append('accountid', accountid);
+    formdata.append('amount', amount);
+    formdata.append('selectpaymenttrpeid', selectpaymenttrpeid);
+    fetch(local_api_url + 'payment_handel', {
+      method: 'POST',
+      body: formdata,
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Check if the upload was successful based on your API response
+        if (data) {
+          console.log(data)
+          setupdateshow(false)
+          // Display a success toast that auto-closes after 3 seconds
+          toast.success('Updated successfully', {
+            duration: 3000, // 3000 milliseconds (3 seconds)
+          });
+          fetchData();
+        } else {
+          // Display an error toast if the API response indicates an error
+          toast.error('Upload failed');
+        }
+      })
+      .catch(error => {
+        // Display an error toast for network errors or other issues
+        toast.error('Upload error: ' + error.message);
+        console.error('Upload error:', error);
+      });   
+    }
+  }
+  const Converttext = val => {
+    const number = val;
+    const words = ConvertNumberToWords(number);
+    console.log(words);
+    setAmountinword(words);
+    setAmount(val);
+  };  
   function deletecategory(lid) {
     Swal.fire({
       title: 'Are you sure?',
@@ -750,6 +774,130 @@ const InvoiceList = () => {
           </Row>
         </ModalBody>
       </Modal>
+      <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
+        <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
+        <ModalBody className='px-sm-5 mx-50 pb-5'>
+          <div className='text-center mb-2'>
+            <h1 className='mb-1'>Supplier Form</h1>
+          </div>
+          <form enctype="multipart/form-data" onSubmit={onsubmit}>
+
+          </form>
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
+            <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
+            <ModalBody className='px-sm-5 mx-50 pb-5'>
+              <div className='text-center mb-2'>
+                <h1 className='mb-1'>Payment</h1>
+              </div>
+              <form enctype="multipart/form-data" onSubmit={onsubmit}>
+                <Row>
+                  <Col md={4} className='mb-2'>
+                    <Label className='form-label' for='categoryname'>
+                      Party Name
+                    </Label>
+                    <input
+                      name='partyname' // Add a name prop to match your form structure if needed
+                      id='partyname'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyname}
+                      disabled
+                    />
+                  </Col>
+                  <Col md={4} className='mb-2'>
+                    <Label className='form-label' for='categoryname'>
+                      Party Aadhar Number
+                    </Label>
+                    <input
+                      name='partyname' // Add a name prop to match your form structure if needed
+                      id='partyname'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyaadharnumber}
+                      disabled
+                    />
+                  </Col>
+                  <Col md={4} className='mb-2'>
+                    <Label className='form-label' for='categoryname'>
+                      Party Phone Number
+                    </Label>
+                    <input
+                      name='partyname' // Add a name prop to match your form structure if needed
+                      id='partyname'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyphonenumber}
+                      disabled
+                    />
+                  </Col>
+                  <Col md={6} className='mb-2'>
+                  <Label className='form-label' for='status'>
+                          Select Bank Account
+                        </Label>
+                        <Select
+                          isClearable={false}
+                          theme={selectThemeColors}
+                          options={groupedOptions}
+                          className='react-select'
+                          classNamePrefix='select'
+                          onChange={issuedata}
+                          value={selectedOption}
+                        />
+                  </Col>
+                  <Col md={6} className='mb-2'>
+                  <Label className='form-label' for='status'>
+                          Payment Type
+                        </Label>
+                        <Select
+                          isClearable={false}
+                          theme={selectThemeColors}
+                          options={paymenttype}
+                          className='react-select'
+                          classNamePrefix='select'
+                          onChange={ispaymenttype}
+                          value={paymentOption}
+                        />
+                  </Col>
+                  <Col md={6} className='mb-2'>
+                  <Label className='form-label' for='categoryname'>
+                      Enter Amount
+                    </Label>
+                    <input
+                      name='amount' // Add a name prop to match your form structure if needed
+                      id='amount'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={amount}
+                      onChange={e => Converttext(e.target.value)}
+                    />
+                  </Col>
+                  <Col md={6} className='mb-2'>
+                  <Label className='form-label' for='categoryname'>
+                      In Word
+                    </Label>
+                    <input
+                      name='amount' // Add a name prop to match your form structure if needed
+                      id='amount'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={amountinword}
+                      disabled
+                    />
+                  </Col>
+                  <Col md={12}>
+                    <Button color='success' onClick={Handelpaynow}>Pay Now</Button>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
       <Modal isOpen={infoshow} toggle={() => setInfoshow(!infoshow)} className='modal-dialog-centered modal-lg'>
         <ModalHeader className='bg-transparent' toggle={() => setInfoshow(!infoshow)}></ModalHeader>
         <ModalBody className='px-sm-5 mx-50 pb-5'>
@@ -807,10 +955,10 @@ const InvoiceList = () => {
             {formaccount.map((items, index) => (
               <>
                 <Col xs={6}>
-                <h5 style={modalShowDataStyle}>{items.account_no}</h5>
+                  <h5 style={modalShowDataStyle}>{items.account_no}</h5>
                 </Col>
                 <Col xs={6}>
-                <h5 style={modalShowDataStyle}>{items.ifsc}</h5>
+                  <h5 style={modalShowDataStyle}>{items.ifsc}</h5>
                 </Col>
               </>
             ))}

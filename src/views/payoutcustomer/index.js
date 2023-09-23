@@ -10,10 +10,6 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { local_api_assets_url } from '@src/common/Helpers'
 
-
-
-
-
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 // ** Third Party Components
@@ -99,8 +95,9 @@ const InvoiceList = () => {
       ifscCode: partyifsccode,
     });
 
-    
+    // Push the values from the dynamically added input sets
 
+    console.log(accountDetails);
     const onsubmit = (e) => {
       e.preventDefault();
       const formdata = new FormData();
@@ -164,7 +161,52 @@ const InvoiceList = () => {
       setcategoryimage(file)
 
     };
-    console.log(inputSets);
+    // console.log(inputSets);
+
+    
+    const createRazorpayContact = async () => {
+      const apiUrl = 'https://api.razorpay.com/v1/contacts';
+      const apiKey = 'rzp_test_SIGjuGKyuuGdO9'; // Replace with your actual API key
+      const apiSecret = 'V9QURyJJ88Tme08nu3e3lwZf'; // Replace with your actual API secret
+    
+      const requestData = {
+        name: 'Gaurav Kumar',
+        email: 'gaurav.kumar@example.com',
+        contact: '9123456789',
+        type: 'employee',
+        reference_id: 'Acme Contact ID 12345',
+        notes: {
+          notes_key_1: 'Tea, Earl Grey, Hot',
+          notes_key_2: 'Tea, Earl Grey… decaf.',
+        },
+      };
+    
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${btoa(`${apiKey}:${apiSecret}`)}`,
+          },
+          body: JSON.stringify(requestData),
+        });
+    
+        if (response.ok) {
+          const responseData = await response.json();
+          // Handle the response data here
+          console.log('Contact created successfully:');
+          console.log(responseData);
+        } else {
+          // Handle non-successful responses here
+          console.error('Error creating contact:', response.status, response.statusText);
+        }
+      } catch (error) {
+        // Handle errors here
+        console.error('Error creating contact:', error.message);
+      }
+    };
+    
+
     return (
       <div className='invoice-list-table-header w-100 py-2'>
         <Row>
@@ -201,12 +243,158 @@ const InvoiceList = () => {
                 placeholder='Search Invoice'
               />
             </div>
-            <Button color='primary' onClick={() => { emptyField(); setShow(true) }}>
+            {/* <Button color='primary' onClick={() => { emptyField(); setShow(true) }}> */}
+            {/* <Button color='primary' onClick={() => { createRazorpayContact(); }}>
               Add New
-            </Button>
+            </Button> */}
+            <button onClick={createRazorpayContact}>Create Razorpay Contact</button>
+            {/* onClick={()=> create_payout_customer()} */}
           </Col>
           <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
             <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
+            <ModalBody className='px-sm-5 mx-50 pb-5'>
+              <div className='text-center mb-2'>
+                <h1 className='mb-1'>New Customer</h1>
+              </div>
+              <form enctype="multipart/form-data" onSubmit={onsubmit}>
+                <Row className='gy-1 pt-75'>
+                  <Col xs={6}>
+                    <Label className='form-label' for='categoryname'>
+                      Party Name
+                    </Label>
+                    <input
+                      name='partyname' // Add a name prop to match your form structure if needed
+                      id='partyname'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyname}
+                      onChange={(e) => setpartyname(e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={6}>
+                    <Label className='form-label' for='categoryname'>
+                      Party Aadhar Number
+                    </Label>
+                    <input
+                      type='number'
+                      name='partyaadharnumber' // Add a name prop to match your form structure if needed
+                      id='partyaadharnumber'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyaadharnumber}
+                      onChange={(e) => setpartyaadharnumber(e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={6}>
+                    <Label className='form-label' for='categoryname'>
+                      Party Phone Number
+                    </Label>
+                    <input
+                      type='number'
+                      name='partyphonenumber' // Add a name prop to match your form structure if needed
+                      id='partyphonenumber'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyphonenumber}
+                      onChange={(e) => setpartyphonenumber(e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={6}>
+                    <Label className='form-label' for='categoryname'>
+                      Party Address
+                    </Label>
+                    <input
+                      name='partyaddress' // Add a name prop to match your form structure if needed
+                      id='partyaddress'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={partyaddress}
+                      onChange={(e) => setpartyaddress(e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={6}>
+                    <Label className='form-label' for='categoryname'>
+                      Remarks
+                    </Label>
+                    <input
+                      name='remarks' // Add a name prop to match your form structure if needed
+                      id='remarks'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                      value={remarks}
+                      onChange={(e) => setremarks(e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={12}>
+                    <h3>Account details</h3>
+                  </Col>
+                  <Col xs={12}>
+
+                    {inputSets.map((inputSet, index) => (
+                      <Row key={index} className='mb-1'>
+                        <Col xs={5}>
+                          <input
+                            name='categoryname'
+                            id={`partyaccountnumber_${index}`}
+                            placeholder='Account Number'
+                            className='custom-input-class form-control'
+                            style={{ fontSize: '16px' }}
+                            value={inputSet.partyaccountnumber}
+                            onChange={(e) =>
+                              handleInputChange(index, 'partyaccountnumber', e.target.value)
+                            }
+                          />
+                        </Col>
+                        <Col xs={5}>
+                          <input
+                            name='categoryname'
+                            id={`partyifsccode_${index}`}
+                            placeholder='IFSC Code'
+                            className='custom-input-class form-control'
+                            style={{ fontSize: '16px' }}
+                            value={inputSet.partyifsccode}
+                            onChange={(e) =>
+                              handleInputChange(index, 'partyifsccode', e.target.value)
+                            }
+                          />
+                        </Col>
+                        <Col xs={2} className='d-flex align-baseline'>
+                          <Button
+                            type='button'
+                            className='me-1'
+                            color='danger'
+                            onClick={() => handleDeleteInputSet(index)}
+                          >
+                            -
+                          </Button>
+                        </Col>
+                      </Row>
+                    ))}
+                  </Col>
+                  <Col xs={12} className='d-flex align-baseline'>
+                    <Button type='button' className='me-1' color='primary' onClick={handleAddInputSet}>
+                      Add Party Account Details
+                    </Button>
+                  </Col>
+                  <Col xs={12} className='text-center mt-2 pt-50'>
+                    <Button type='button' className='me-1' color='primary'>
+                      Submit
+                    </Button>
+                    <Button type='reset' color='secondary' outline onClick={() => setShow(false)}>
+                      Discard
+                    </Button>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+          <Modal isOpen={show} toggle={() => setShow(!infoshow)} className='modal-dialog-centered modal-lg'>
+            <ModalHeader className='bg-transparent' toggle={() => setShow(!infoshow)}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
               <div className='text-center mb-2'>
                 <h1 className='mb-1'>Supplier Form</h1>
@@ -219,6 +407,7 @@ const InvoiceList = () => {
                     </Label>
                     <input
                       name='partyname' // Add a name prop to match your form structure if needed
+                      readOnly
                       id='partyname'
                       placeholder=''
                       className='custom-input-class form-control'
@@ -348,7 +537,6 @@ const InvoiceList = () => {
               </form>
             </ModalBody>
           </Modal>
-          
         </Row>
       </div>
     )

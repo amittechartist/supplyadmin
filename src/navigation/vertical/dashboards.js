@@ -23,5 +23,10 @@ export default [
     icon: <Plus size={20} />,
     navLink: app_url+'/slipgeneration',
   },
-  
+  {
+    id: 'payments',
+    title: 'Payments',
+    icon: <Plus size={20} />,
+    navLink: app_url+'/payments',
+  },
 ]

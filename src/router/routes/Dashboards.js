@@ -3,7 +3,9 @@ import { app_url } from '@src/common/Helpers'
 const DashboardEcommerce = lazy(() => import('../../views/dashboard/ecommerce'))
 const ProductView = lazy(() => import('../../views/product/productview'))
 const Catagory = lazy(() => import('../../views/catagory'))
+const Payoutcustomer = lazy(() => import('../../views/payoutcustomer'))
 const Product = lazy(() => import('../../views/product'))
+const Payments = lazy(() => import('../../views/payments'))
 
 const DashboardRoutes = [
   // {
@@ -26,7 +28,14 @@ const DashboardRoutes = [
     path: app_url+'/viewproduct/:pid',
     element: <ProductView/>
   },
-  
+  {
+    path: app_url+'/payout_customer',
+    element: <Payoutcustomer />
+  }, 
+  {
+    path: app_url+'/payments',
+    element: <Payments />
+  }, 
 ]
 
 export default DashboardRoutes

@@ -86,6 +86,28 @@ const InvoiceList = () => {
     const [partyaddress, setpartyaddress]  = useState("");
     const [reamak, setreamak]  = useState("");
     const [selectedOption, setSelectedOption] = useState(null);
+    const [getvehicleapiloader, setGetvehicleapiloader]  = useState(false);
+    const [isvehicleapi, setIsvehicleapi]  = useState(false);
+    const [formattedDatein, setformattedDatein]  = useState("");
+    const [formattedTimein, setformattedTimein]  = useState("");
+    const [formattedDateout, setformattedDateout]  = useState("");
+    const [formattedTimeout, setformattedTimeout]  = useState("");
+    const [indateandtime, setIndateandtime]  = useState("");
+    useEffect(() => {
+      const indate = new Date(pickerin);
+      const getingdata = indate.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    
+      const getingdtime = indate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      setIndateandtime(getingdata +' '+getingdtime);
+    }, []);
+
     const handleFileChangemeta = (e) => {
       const file = e.target.files[0]; // Get the first selected file
       setmetaimage(file);
@@ -94,6 +116,49 @@ const InvoiceList = () => {
       setSelectedOption(selectedValue);
       fetchaadhardata(selectedValue.value);
     };
+    
+    function getvehicleapi(){
+      if(!trno || !vehicleno){
+        toast.error('TR No & Vehicle No is required');
+      }else{
+        setGetvehicleapiloader(true);
+        const getvehicleapi_url = 'https://getwebapic2.loophole.site/wb1/?vehno='+vehicleno+'&trno='+trno;
+        try {
+          fetch(getvehicleapi_url, {
+            method: 'GET'
+          })
+            .then(response => {
+              if (!response.ok) {
+                toast.error('server is currently busy please try again');
+                setGetvehicleapiloader(false);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log(data);
+              setGetvehicleapiloader(false);
+              setIsvehicleapi(true);
+              settrno(data.TRNo);
+              setvehicleno(data.VehicleNo);
+              settypeofmaterial(data.TypeofMaterial);
+              setgrossweight(data.GrossWeight);
+              settareweight(data.TareWeight);
+              setnetweight(data.NetWeight);
+              setformattedDatein(data.DateIn);
+              setformattedTimein(data.TimeIn);
+              setformattedDateout(data.DateOut);
+              setformattedTimeout(data.TimeOut);
+            })
+            .catch(error => {
+              toast.error('server is currently busy please try again');
+              setGetvehicleapiloader(false);
+            }); 
+        } catch (error) {
+          toast.error('server is currently busy please try again');
+          setGetvehicleapiloader(false);
+        }
+      }
+    }
     function fetchaadhardata(id) {
         if(id){
           fetch(local_api_url + 'supplier_form_get/' + id, {
@@ -117,40 +182,43 @@ const InvoiceList = () => {
       // setShow(false);
     // pickerin
     // pickerout
-    const get_in_data = new Date(pickerin);
-    const formattedDate_in = get_in_data.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  
-    const formattedTime_in = get_in_data.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-
-    const get_out_data = new Date(pickerout);
-    const formattedDate_out = get_out_data.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  
-    const formattedTime_out = get_out_data.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    if(!isvehicleapi){
+      const get_in_data = new Date(pickerin);
+      const formattedDate_in = get_in_data.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      setformattedDatein(formattedDate_in);
     
+      const formattedTime_in = get_in_data.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      setformattedTimein(formattedTime_in);
+
+      const get_out_data = new Date(pickerout);
+      const formattedDate_out = get_out_data.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      setformattedDateout(formattedDate_out);
+    
+      const formattedTime_out = get_out_data.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      setformattedTimeout(formattedTime_out);
+    }
       const formdata = new FormData();
       formdata.append('supply_id', supplyid);
       formdata.append('trno', trno);
       formdata.append('vehicleno', vehicleno);
-
-      formdata.append('datein', formattedDate_in);
-      formdata.append('timein', formattedTime_in);
-      formdata.append('dateout', formattedDate_out);
-      formdata.append('timeout', formattedTime_out);
-
+      formdata.append('datein', formattedDatein);
+      formdata.append('timein', formattedTimein);
+      formdata.append('dateout', formattedDateout);
+      formdata.append('timeout', formattedTimeout);
       formdata.append('typeofmaterial', typeofmaterial);
       formdata.append('grossweight', grossweight);
       formdata.append('tareweight', tareweight);
@@ -385,7 +453,7 @@ const InvoiceList = () => {
               <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                   <Col sm='12' md='12' xl='12'>
-                    <Row>
+                    <Row >
                       <Col md={4} xs={4} className='py-2'>
                         <Label className='form-label' for='status'>
                           Party Aadhar Number
@@ -466,8 +534,8 @@ const InvoiceList = () => {
                   </Col>
 
                 </Row>
-                <Row>
-                  <Col md={6} xs={6} className='py-2'>
+                <Row className='align-items-baseline'>
+                  <Col md={4} xs={4} className='py-2'>
                     <Label className='form-label' for='productprice'>
                       TR No
                     </Label>
@@ -482,22 +550,7 @@ const InvoiceList = () => {
                     onChange={(e) => settrno(e.target.value)}
                     />
                   </Col>
-                  <Col md={6} xs={6} className='py-2'>
-                    <Label className='form-label' for='productprice'>
-                      Type of Material
-                    </Label>
-                    <input
-                      type='text'
-                      name='partyaadharnumber' // Add a name prop to match your form structure if needed
-                      id='partyaadharnumber'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                    value={typeofmaterial}
-                    onChange={(e) => settypeofmaterial(e.target.value)}
-                    />
-                  </Col>
-                  <Col md={6} xs={6} className='py-2'>
+                  <Col md={4} xs={4} className='py-2'>
                     <Label className='form-label' for='productprice'>
                       Vehicle No
                     </Label>
@@ -512,7 +565,36 @@ const InvoiceList = () => {
                     onChange={(e) => setvehicleno(e.target.value)}
                     />
                   </Col>
-                  <Col md={6} xs={6} className='py-2'>
+                  <Col md={4} xs={4} className='py-2'>
+                  <Label className='form-label d-block' for='productprice'>
+                      For Auto Fill
+                  </Label>
+                  {getvehicleapiloader ? (
+                    <Button type='button' disabled className='me-1 w-100' color='primary'>
+                      Loading ...
+                    </Button>
+                  ):(
+                    <Button type='button' onClick={getvehicleapi} className='me-1 w-100' color='primary'>
+                    Get Data
+                  </Button>
+                  )}
+                  </Col>
+                  <Col md={3} xs={3} className='py-2'>
+                    <Label className='form-label' for='productprice'>
+                      Type of Material
+                    </Label>
+                    <input
+                      type='text'
+                      name='partyaadharnumber' // Add a name prop to match your form structure if needed
+                      id='partyaadharnumber'
+                      placeholder=''
+                      className='custom-input-class form-control'
+                      style={{ fontSize: '16px' }}
+                    value={typeofmaterial}
+                    onChange={(e) => settypeofmaterial(e.target.value)}
+                    />
+                  </Col>
+                  <Col md={3} xs={3} className='py-2'>
                     <Label className='form-label' for='productprice'>
                       Gross Weight
                     </Label>
@@ -527,31 +609,7 @@ const InvoiceList = () => {
                     onChange={(e) => setgrossweight(e.target.value)}
                     />
                   </Col>
-                  <Col md={6} xs={6} className='py-2'>
-                    <Label className='form-label' for='productprice'>
-                      Date & Time In
-                    </Label>
-                    <Flatpickr
-                      value={pickerin}
-                      data-enable-time
-                      id='date-time-picker'
-                      className='form-control'
-                      onChange={date => setPickerin(date)}
-                    />
-                  </Col>
-                  <Col md={6} xs={6} className='py-2'>
-                    <Label className='form-label' for='productprice'>
-                    Date & Time Out
-                    </Label>
-                    <Flatpickr
-                        value={pickerout}
-                        data-enable-time
-                        id='date-time-picker'
-                        className='form-control'
-                        onChange={date => setPickerout(date)}
-                      />
-                  </Col>
-                  <Col md={6} xs={6} className='py-2'>
+                  <Col md={3} xs={3} className='py-2'>
                     <Label className='form-label' for='productprice'>
                       Tare Weight
                     </Label>
@@ -566,7 +624,7 @@ const InvoiceList = () => {
                     onChange={(e) => settareweight(e.target.value)}
                     />
                   </Col>
-                  <Col md={6} xs={6} className='py-2'>
+                  <Col md={3} xs={3} className='py-2'>
                     <Label className='form-label' for='productprice'>
                       Net Weight
                     </Label>
@@ -580,6 +638,29 @@ const InvoiceList = () => {
                     value={netweight}
                     onChange={(e) => setnetweight(e.target.value)}
                     />
+                  </Col>
+                  <Col md={6} xs={6} className='py-2'>
+                    <Label readOnly className='form-label' for='productprice'>
+                      Date & Time In
+                    </Label>
+                    <input
+                      readOnly
+                      value={indateandtime}
+                      data-enable-time
+                      className='form-control'
+                    />
+                  </Col>
+                  <Col md={6} xs={6} className='py-2'>
+                    <Label className='form-label' for='productprice'>
+                    Date & Time Out
+                    </Label>
+                    <Flatpickr
+                        value={pickerout}
+                        data-enable-time
+                        id='date-time-picker'
+                        className='form-control'
+                        onChange={date => setPickerout(date)}
+                      />
                   </Col>
                 </Row>
                 <Row>
