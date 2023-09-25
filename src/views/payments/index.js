@@ -9,11 +9,6 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { local_api_assets_url } from '@src/common/Helpers'
-
-
-
-
-
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 // ** Third Party Components
@@ -412,6 +407,8 @@ const InvoiceList = () => {
     setSortColumn(column.sortField);
     // Fetch data here with new sort parameters
   };
+
+  const [partyId, setpartyId] = useState();
   const [partyname, setpartyname] = useState();
   const [partyaadharnumber, setpartyaadharnumber] = useState();
   const [partyphonenumber, setpartyphonenumber] = useState();
@@ -424,7 +421,7 @@ const InvoiceList = () => {
   const [formaccount, setFormaccount] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
   const [paymentOption, setPaymentOption] = useState(null);
-  const [selectpaymenttrpeid, setSelectpaymenttrpeid] = useState(null);
+  const [selectpayment_typeid, setSelectpayment_typeid] = useState(null);
 
   function viewdetails(id) {
     fetch(local_api_url + 'supplier_form_get/' + id, {
@@ -453,7 +450,7 @@ const InvoiceList = () => {
   };
   const ispaymenttype = (selectedValue) => {
     setPaymentOption(selectedValue);
-    setSelectpaymenttrpeid(selectedValue.value);
+    setSelectpayment_typeid(selectedValue.value);
   };
   function getpaymentdetails(id) {
 
@@ -462,6 +459,7 @@ const InvoiceList = () => {
     })
       .then(response => response.json())
       .then(data => {
+        setpartyId(id);
         setpartyname(data.form_data.name);
         setpartyaadharnumber(data.form_data.aadhar_no);
         setpartyphonenumber(data.form_data.phone_number);
@@ -542,22 +540,17 @@ const InvoiceList = () => {
     return result.trim();
   };
   function Handelpaynow(){
-    console.log(partyname);
-    console.log(partyaadharnumber);
-    console.log(partyphonenumber);
-    console.log(accountid);
-    console.log(amount);
-    console.log(selectpaymenttrpeid);
-    if(!partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpaymenttrpeid){
+    if(!partyId || !partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpayment_typeid){
       toast.error("All field required");
     }else{
       const formdata = new FormData();
+    formdata.append('partyid', partyId);
     formdata.append('partyname', partyname);
     formdata.append('partyaadharnumber', partyaadharnumber);
     formdata.append('partyphonenumber', partyphonenumber);
     formdata.append('accountid', accountid);
     formdata.append('amount', amount);
-    formdata.append('selectpaymenttrpeid', selectpaymenttrpeid);
+    formdata.append('selectpayment_typeid', selectpayment_typeid);
     fetch(local_api_url + 'payment_handel', {
       method: 'POST',
       body: formdata,

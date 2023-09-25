@@ -124,6 +124,8 @@ const InvoiceList = () => {
               duration: 3000, // 3000 milliseconds (3 seconds)
             });
             fetchData();
+            console.log(data);
+            fundaccountcreate(data);
           } else {
             // Display an error toast if the API response indicates an error
             toast.error('Upload failed');
@@ -135,7 +137,29 @@ const InvoiceList = () => {
           console.error('Upload error:', error);
         });
     };
-
+    function fundaccountcreate(id){
+      const formdata = new FormData();
+      formdata.append('id', id);
+      fetch(local_api_url + 'fundaccount_create', {
+        method: 'POST',
+        body: formdata,
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Check if the upload was successful based on your API response
+          if (data) {
+            console.log('Success');
+          } else {
+           
+            toast.error('Upload failed');
+          }
+        })
+        .catch(error => {
+          // Display an error toast for network errors or other issues
+          toast.error('Upload error: ' + error.message);
+          console.error('Upload error:', error);
+        });
+    }
     const [inputSets, setInputSets] = useState([]);
 
     const handleAddInputSet = () => {
