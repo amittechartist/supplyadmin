@@ -67,6 +67,7 @@ import toast from 'react-hot-toast';
 const InvoiceList = () => {
   const CustomHeader = ({ handleFilter, value, handleStatusValue, statusValue, handlePerPage, rowsPerPage }) => {
     const [show, setShow] = useState(false)
+    const [loader, setLoader] = useState(false)
     const [categoryid, setcategoryid] = useState("");
     const [metatitle, setmetatitle] = useState("");
     const [trno, settrno]  = useState("");
@@ -211,6 +212,7 @@ const InvoiceList = () => {
       });
       setformattedTimeout(formattedTime_out);
     }
+      setLoader(true);
       const formdata = new FormData();
       formdata.append('supply_id', supplyid);
       formdata.append('trno', trno);
@@ -229,6 +231,7 @@ const InvoiceList = () => {
       })
         .then(response => response.json())
         .then(data => {
+          setLoader(false);
           // Check if the upload was successful based on your API response
           if (data) {
             fetchData();
@@ -474,7 +477,7 @@ const InvoiceList = () => {
                         </Label>
                         <input
                           type='text'
-                          readOnly
+                          disabled
                           name='partyaadharnumber' // Add a name prop to match your form structure if needed
                           id='partyaadharnumber'
                           placeholder=''
@@ -489,7 +492,7 @@ const InvoiceList = () => {
                         </Label>
                         <input
                           type='text'
-                          readOnly
+                          disabled
                           name='partyaadharnumber' // Add a name prop to match your form structure if needed
                           id='partyaadharnumber'
                           placeholder=''
@@ -504,7 +507,7 @@ const InvoiceList = () => {
                           Party Address
                         </Label>
                         <input
-                        readOnly
+                        disabled
                           type='text'
                           name='partyaadharnumber' // Add a name prop to match your form structure if needed
                           id='partyaadharnumber'
@@ -520,7 +523,7 @@ const InvoiceList = () => {
                           Remarks
                         </Label>
                         <input
-                        readOnly
+                        disabled
                           type='text'
                           name='partyaadharnumber' // Add a name prop to match your form structure if needed
                           id='partyaadharnumber'
@@ -640,7 +643,7 @@ const InvoiceList = () => {
                     />
                   </Col>
                   <Col md={6} xs={6} className='py-2'>
-                    <Label readOnly className='form-label' for='productprice'>
+                    <Label  className='form-label' for='productprice'>
                       Date & Time In
                     </Label>
                     <input
@@ -667,9 +670,16 @@ const InvoiceList = () => {
 
                 </Row>
                 <Col xs={12} className='text-center mt-2 pt-50'>
-                  <Button type='submit' className='me-1' color='primary'>
+                  {loader ?(
+                    <Button disabled type='button' className='me-1' color='primary'>
+                    Loading...
+                  </Button>  
+                  ):(
+                    <Button type='submit' className='me-1' color='primary'>
                     Submit
                   </Button>
+                  )}
+                  
                   <Button type='reset' color='secondary' outline onClick={() => setShow(false)}>
                     Discard
                   </Button>

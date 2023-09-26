@@ -93,16 +93,44 @@ const InvoiceList = () => {
     const [remarks, setremarks] = useState();
     const [partyaccountnumber, setpartyaccountnumber] = useState([]);
     const [partyifsccode, setpartyifsccode] = useState([]);
+    const [loader, setLoader] = useState(false);
     const accountDetails = [];
-    accountDetails.push({
-      accountNumber: partyaccountnumber,
-      ifscCode: partyifsccode,
-    });
-
-    
-
+    if(partyaccountnumber.length > 0 && partyifsccode.length > 0){
+      accountDetails.push({
+          accountNumber: partyaccountnumber,
+          ifscCode: partyifsccode,
+      });
+    }
     const onsubmit = (e) => {
       e.preventDefault();
+      if(!partyname || !partyaadharnumber || !partyphonenumber || !partyaddress){
+        toast.error('All fields are mandatory', {
+          duration: 3000, // 3000 milliseconds (3 seconds)
+        });
+        return false;
+      }
+      if(!accountDetails.length > 0){
+        toast.error('Enter bank details', {
+          duration: 3000, // 3000 milliseconds (3 seconds)
+        });
+        return false;
+      }
+      
+      if (!/^\d{12}$/.test(partyaadharnumber)) {
+        toast.error('Aadhar Number must be 12 digits', {
+          duration: 3000,
+        });
+        return false;
+      }
+      
+      // Validate Phone Number (10 digits)
+      if (!/^\d{10}$/.test(partyphonenumber)) {
+        toast.error('Phone Number must be 10 digits', {
+          duration: 3000,
+        });
+        return false;
+      }
+      setLoader(true);
       const formdata = new FormData();
       formdata.append('id', id);
       formdata.append('name', partyname);
@@ -117,25 +145,25 @@ const InvoiceList = () => {
       })
         .then(response => response.json())
         .then(data => {
-          // Check if the upload was successful based on your API response
-          if (data) {
-            // Display a success toast that auto-closes after 3 seconds
-            toast.success('Updated successfully', {
-              duration: 3000, // 3000 milliseconds (3 seconds)
+          setLoader(false);
+          if (data.status_code == 200) {
+            toast.success('Supplier account creation successful', {
+              duration: 3000,
             });
             fetchData();
-          } else {
-            // Display an error toast if the API response indicates an error
-            toast.error('Upload failed');
+          } else if(data.status_code == 400) {
+            toast.error(data.error_message);
+          }else{
+            toast.error('Server Issue');
           }
         })
         .catch(error => {
+          setLoader(false);
           // Display an error toast for network errors or other issues
           toast.error('Upload error: ' + error.message);
           console.error('Upload error:', error);
         });
     };
-
     const [inputSets, setInputSets] = useState([]);
 
     const handleAddInputSet = () => {
@@ -154,17 +182,18 @@ const InvoiceList = () => {
       setInputSets(updatedInputSets);
     };
     inputSets.forEach((inputSet) => {
-      accountDetails.push({
-        accountNumber: inputSet.partyaccountnumber,
-        ifscCode: inputSet.partyifsccode,
-      });
+      if(inputSet.partyaccountnumber.length > 0 && inputSet.partyifsccode.length > 0 ){
+        accountDetails.push({
+          accountNumber: inputSet.partyaccountnumber,
+          ifscCode: inputSet.partyifsccode,
+        });
+      }
     });
     const handleFileChange = (e) => {
       const file = e.target.files[0];
       setcategoryimage(file)
 
     };
-    console.log(inputSets);
     return (
       <div className='invoice-list-table-header w-100 py-2'>
         <Row>
@@ -337,9 +366,12 @@ const InvoiceList = () => {
                     </Button>
                   </Col>
                   <Col xs={12} className='text-center mt-2 pt-50'>
-                    <Button type='submit' className='me-1' color='primary'>
-                      Submit
-                    </Button>
+                    {loader ?(
+                      <Button type='button' disabled className='me-1' color='primary'>Loading...</Button>
+                    ):(
+                      <Button type='submit' className='me-1' color='primary'>Submit</Button>
+                    )
+                    }
                     <Button type='reset' color='secondary' outline onClick={() => setShow(false)}>
                       Discard
                     </Button>
@@ -491,7 +523,6 @@ const InvoiceList = () => {
         <div className='column-action d-flex align-items-center'>
           {/* <Edit onClick={() => editbutton(row.id)} className='cursor-pointer' size={15} /> */}
           <Info onClick={() => { viewdetails(row.id) }} className='cursor-pointer' size={15} />
-          <Trash onClick={e => { deletecategory(row.id) }} className='me-50 mx-2 cursor-pointer' size={15} />
         </div>
       )
     }

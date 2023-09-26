@@ -9,11 +9,6 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { local_api_assets_url } from '@src/common/Helpers'
-
-
-
-
-
 // ** Styles
 import '@styles/react/libs/react-select/_react-select.scss'
 // ** Third Party Components
@@ -98,9 +93,6 @@ const InvoiceList = () => {
       accountNumber: partyaccountnumber,
       ifscCode: partyifsccode,
     });
-
-
-
     const onsubmit = (e) => {
       e.preventDefault();
       const formdata = new FormData();
@@ -361,7 +353,6 @@ const InvoiceList = () => {
         <div className='column-action d-flex align-items-center'>
           {/* <Edit onClick={() => editbutton(row.id)} className='cursor-pointer' size={15} /> */}
           <Info onClick={() => { viewdetails(row.id) }} className='cursor-pointer' size={15} />
-          <Trash onClick={e => { deletecategory(row.id) }} className='me-50 mx-2 cursor-pointer' size={15} />
         </div>
       )
     }
@@ -412,6 +403,8 @@ const InvoiceList = () => {
     setSortColumn(column.sortField);
     // Fetch data here with new sort parameters
   };
+
+  const [partyId, setpartyId] = useState();
   const [partyname, setpartyname] = useState();
   const [partyaadharnumber, setpartyaadharnumber] = useState();
   const [partyphonenumber, setpartyphonenumber] = useState();
@@ -424,7 +417,8 @@ const InvoiceList = () => {
   const [formaccount, setFormaccount] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null);
   const [paymentOption, setPaymentOption] = useState(null);
-  const [selectpaymenttrpeid, setSelectpaymenttrpeid] = useState(null);
+  const [selectpayment_typeid, setSelectpayment_typeid] = useState(null);
+  const [loader, Setloader] = useState(false);
 
   function viewdetails(id) {
     fetch(local_api_url + 'supplier_form_get/' + id, {
@@ -453,7 +447,7 @@ const InvoiceList = () => {
   };
   const ispaymenttype = (selectedValue) => {
     setPaymentOption(selectedValue);
-    setSelectpaymenttrpeid(selectedValue.value);
+    setSelectpayment_typeid(selectedValue.value);
   };
   function getpaymentdetails(id) {
 
@@ -462,6 +456,7 @@ const InvoiceList = () => {
     })
       .then(response => response.json())
       .then(data => {
+        setpartyId(id);
         setpartyname(data.form_data.name);
         setpartyaadharnumber(data.form_data.aadhar_no);
         setpartyphonenumber(data.form_data.phone_number);
@@ -494,7 +489,7 @@ const InvoiceList = () => {
     const units = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
     const teens = ["", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
     const tens = ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-    const thousands = ["", "thousand", "million", "billion", "trillion"];
+    const thousands = ["", "Thousand", "Lakh", "Crore"];
   
     const capitalizeWord = (word) => {
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
@@ -542,40 +537,37 @@ const InvoiceList = () => {
     return result.trim();
   };
   function Handelpaynow(){
-    console.log(partyname);
-    console.log(partyaadharnumber);
-    console.log(partyphonenumber);
-    console.log(accountid);
-    console.log(amount);
-    console.log(selectpaymenttrpeid);
-    if(!partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpaymenttrpeid){
+    if(!partyId || !partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpayment_typeid){
       toast.error("All field required");
     }else{
+      Setloader(true);
       const formdata = new FormData();
+    formdata.append('partyid', partyId);
     formdata.append('partyname', partyname);
     formdata.append('partyaadharnumber', partyaadharnumber);
     formdata.append('partyphonenumber', partyphonenumber);
     formdata.append('accountid', accountid);
     formdata.append('amount', amount);
-    formdata.append('selectpaymenttrpeid', selectpaymenttrpeid);
+    formdata.append('selectpayment_typeid', selectpayment_typeid);
     fetch(local_api_url + 'payment_handel', {
       method: 'POST',
       body: formdata,
     })
       .then(response => response.json())
       .then(data => {
+        Setloader(false);
         // Check if the upload was successful based on your API response
-        if (data) {
-          console.log(data)
+        if (data.status_code == 200) {
+          setShow(false);
           setupdateshow(false)
           // Display a success toast that auto-closes after 3 seconds
-          toast.success('Updated successfully', {
+          toast.success('Money transfer successful', {
             duration: 3000, // 3000 milliseconds (3 seconds)
           });
           fetchData();
-        } else {
+        } else if(data.status_code == 400) {
           // Display an error toast if the API response indicates an error
-          toast.error('Upload failed');
+          toast.error(data.response);
         }
       })
       .catch(error => {
@@ -717,74 +709,6 @@ const InvoiceList = () => {
   return (
 
     <div className='invoice-list-wrapper'>
-      <Modal isOpen={updateshow} toggle={() => setupdateshow(!updateshow)} className='modal-dialog-centered modal-lg'>
-        <ModalHeader className='bg-transparent' toggle={() => setupdateshow(!updateshow)}></ModalHeader>
-        <ModalBody className='px-sm-5 mx-50 pb-5'>
-          <div className='text-center mb-2'>
-            <h1 className='mb-1'>Update Product</h1>
-          </div>
-          <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit}>
-            <Row className='gy-1 pt-75'>
-              <Col xs={6}>
-                <Label className='form-label' for='categoryname'>
-                  Category
-                </Label>
-                <input
-                  name='categoryname' // Add a name prop to match your form structure if needed
-                  id='categoryname'
-                  placeholder=''
-                  className='custom-input-class form-control'
-                  style={{ fontSize: '16px' }}
-                  value={categoryname}
-                  onChange={(e) => setcategoryname(e.target.value)}
-                />
-              </Col>
-              <Col xs={6}>
-                <Label className='form-label' for='categoryimage'>
-                  Choose icon
-                </Label>
-
-                <div className='d-flex justify-content-center'>
-                  {catimg ? (
-                    <>
-                      <img
-                        src={catimg}
-                        onClick={handleCardClick}
-                        alt="Preview"
-                        className='img-fluid'
-                        style={{ cursor: 'pointer', height: '270px', width: '350px' }}
-                      />
-                      <input type='file' ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
-                    </>
-
-                  ) : (
-                    <input type='file' className='form-control' ref={fileInputRef} onChange={handleFileChange} />
-                  )}
-                </div>
-              </Col>
-            </Row>
-            <Col xs={12} className='text-center mt-2 pt-50'>
-              <Button type='submit' className='me-1' color='primary'>
-                Submit
-              </Button>
-              <Button type='reset' color='secondary' outline onClick={() => setupdateshow(false)}>
-                Discard
-              </Button>
-            </Col>
-          </Row>
-        </ModalBody>
-      </Modal>
-      <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
-        <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
-        <ModalBody className='px-sm-5 mx-50 pb-5'>
-          <div className='text-center mb-2'>
-            <h1 className='mb-1'>Supplier Form</h1>
-          </div>
-          <form enctype="multipart/form-data" onSubmit={onsubmit}>
-
-          </form>
-        </ModalBody>
-      </Modal>
       <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
             <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
             <ModalBody className='px-sm-5 mx-50 pb-5'>
@@ -892,7 +816,11 @@ const InvoiceList = () => {
                     />
                   </Col>
                   <Col md={12}>
-                    <Button color='success' onClick={Handelpaynow}>Pay Now</Button>
+                  {loader ?(
+                      <Button color='success' disabled type='button'>Loading...</Button>
+                    ):(
+                      <Button color='success' onClick={Handelpaynow}>Pay Now</Button>
+                    )}
                   </Col>
                 </Row>
               </form>
