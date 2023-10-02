@@ -60,9 +60,10 @@ const invoiceStatusObj = {
 // import { Card, , CardTitle, CardBody, Button, ListGroup, ListGroupItem } from 'reactstrap'
 import { useDropzone } from 'react-dropzone'
 import { FileText, DownloadCloud } from 'react-feather'
-import { api_url, app_url, api_assets_url,local_api_url } from '@src/common/Helpers'
+import { api_url, app_url, api_assets_url, local_api_url } from '@src/common/Helpers'
 import Swal from 'sweetalert2';
 import toast from 'react-hot-toast';
+import { clippingParents } from '@popperjs/core'
 // 
 const InvoiceList = () => {
   const CustomHeader = ({ handleFilter, value, handleStatusValue, statusValue, handlePerPage, rowsPerPage }) => {
@@ -70,30 +71,30 @@ const InvoiceList = () => {
     const [loader, setLoader] = useState(false)
     const [categoryid, setcategoryid] = useState("");
     const [metatitle, setmetatitle] = useState("");
-    const [trno, settrno]  = useState("");
-    const [vehicleno, setvehicleno]  = useState("");
-    const [typeofmaterial, settypeofmaterial]  = useState("");
-    const [grossweight, setgrossweight]  = useState("");
-    const [tareweight, settareweight]  = useState("");
-    const [netweight, setnetweight]  = useState("");
+    const [trno, settrno] = useState("");
+    const [vehicleno, setvehicleno] = useState("");
+    const [typeofmaterial, settypeofmaterial] = useState("");
+    const [grossweight, setgrossweight] = useState("");
+    const [tareweight, settareweight] = useState("");
+    const [netweight, setnetweight] = useState("");
     const [metades, setmetades] = useState("");
     const [metaimage, setmetaimage] = useState(null);
-    const [pickerin, setPickerin] = useState(new Date())
-    const [pickerout, setPickerout] = useState(new Date())
-    const [supplyid, setSupplyid]  = useState("");
-    const [aadharno, setAadharno]  = useState("");
-    const [partyname, setpartyname]  = useState("");
-    const [partyphonenumber, setpartyphonenumber]  = useState("");
-    const [partyaddress, setpartyaddress]  = useState("");
-    const [reamak, setreamak]  = useState("");
+    const [pickerin, setPickerin] = useState(new Date());
+    const [pickerout, setPickerout] = useState(new Date());
+    const [supplyid, setSupplyid] = useState("");
+    const [aadharno, setAadharno] = useState("");
+    const [partyname, setpartyname] = useState("");
+    const [partyphonenumber, setpartyphonenumber] = useState("");
+    const [partyaddress, setpartyaddress] = useState("");
+    const [reamak, setreamak] = useState("");
     const [selectedOption, setSelectedOption] = useState(null);
-    const [getvehicleapiloader, setGetvehicleapiloader]  = useState(false);
-    const [isvehicleapi, setIsvehicleapi]  = useState(false);
-    const [formattedDatein, setformattedDatein]  = useState("");
-    const [formattedTimein, setformattedTimein]  = useState("");
-    const [formattedDateout, setformattedDateout]  = useState("");
-    const [formattedTimeout, setformattedTimeout]  = useState("");
-    const [indateandtime, setIndateandtime]  = useState("");
+    const [getvehicleapiloader, setGetvehicleapiloader] = useState(false);
+    const [isvehicleapi, setIsvehicleapi] = useState(false);
+    const [formattedDatein, setformattedDatein] = useState("");
+    const [formattedTimein, setformattedTimein] = useState("");
+    const [formattedDateout, setformattedDateout] = useState("");
+    const [formattedTimeout, setformattedTimeout] = useState("");
+    const [indateandtime, setIndateandtime] = useState("");
     useEffect(() => {
       const indate = new Date(pickerin);
       const getingdata = indate.toLocaleDateString('en-IN', {
@@ -101,12 +102,12 @@ const InvoiceList = () => {
         month: '2-digit',
         year: 'numeric',
       });
-    
+
       const getingdtime = indate.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
       });
-      setIndateandtime(getingdata +' '+getingdtime);
+      setIndateandtime(getingdata + ' ' + getingdtime);
     }, []);
 
     const handleFileChangemeta = (e) => {
@@ -117,13 +118,13 @@ const InvoiceList = () => {
       setSelectedOption(selectedValue);
       fetchaadhardata(selectedValue.value);
     };
-    
-    function getvehicleapi(){
-      if(!trno || !vehicleno){
+
+    function getvehicleapi() {
+      if (!trno || !vehicleno) {
         toast.error('TR No & Vehicle No is required');
-      }else{
+      } else {
         setGetvehicleapiloader(true);
-        const getvehicleapi_url = 'https://getwebapic2.loophole.site/wb1/?vehno='+vehicleno+'&trno='+trno;
+        const getvehicleapi_url = 'https://getwebapic2.loophole.site/wb1/?vehno=' + vehicleno + '&trno=' + trno;
         try {
           fetch(getvehicleapi_url, {
             method: 'GET'
@@ -153,7 +154,7 @@ const InvoiceList = () => {
             .catch(error => {
               toast.error('server is currently busy please try again');
               setGetvehicleapiloader(false);
-            }); 
+            });
         } catch (error) {
           toast.error('server is currently busy please try again');
           setGetvehicleapiloader(false);
@@ -161,66 +162,79 @@ const InvoiceList = () => {
       }
     }
     function fetchaadhardata(id) {
-        if(id){
-          fetch(local_api_url + 'supplier_form_get/' + id, {
-            method: 'GET'
+      if (id) {
+        fetch(local_api_url + 'supplier_form_get/' + id, {
+          method: 'GET'
+        })
+          .then(response => response.json())
+          .then(data => {
+            setSupplyid(data.form_data.id);
+            setAadharno(data.form_data.aadhar_no);
+            setpartyname(data.form_data.name);
+            setpartyphonenumber(data.form_data.phone_number);
+            setpartyaddress(data.form_data.address);
+            setreamak(data.form_data.remark);
           })
-            .then(response => response.json())
-            .then(data => {
-              setSupplyid(data.form_data.id);
-              setAadharno(data.form_data.aadhar_no);
-              setpartyname(data.form_data.name);
-              setpartyphonenumber(data.form_data.phone_number);
-              setpartyaddress(data.form_data.address);
-              setreamak(data.form_data.remark);
-            })
-            .catch(error => {
-              console.error('Error deleting category:', error);
-            }); 
-        }
+          .catch(error => {
+            console.error('Error deleting category:', error);
+          });
+      }
     }
-    const onSubmit = data => {
+    function submitslip() {
       // setShow(false);
-    // pickerin
-    // pickerout
-    if(!isvehicleapi){
-      const get_in_data = new Date(pickerin);
-      const formattedDate_in = get_in_data.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
-      setformattedDatein(formattedDate_in);
-    
-      const formattedTime_in = get_in_data.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      setformattedTimein(formattedTime_in);
+      // pickerin
+      // pickerout
+      var formattedDate_in = '';
+      var formattedTime_in = '';
+      var formattedDate_out = '';
+      var formattedTime_out = '';
+      if (!isvehicleapi) {
+        const get_in_data = new Date(pickerin);
+        formattedDate_in = get_in_data.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+        formattedTime_in = get_in_data.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
 
-      const get_out_data = new Date(pickerout);
-      const formattedDate_out = get_out_data.toLocaleDateString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      });
-      setformattedDateout(formattedDate_out);
-    
-      const formattedTime_out = get_out_data.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      setformattedTimeout(formattedTime_out);
-    }
+        const get_out_data = new Date(pickerout);
+        formattedDate_out = get_out_data.toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+
+        formattedTime_out = get_out_data.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+
+      if (!supplyid || !trno || !vehicleno || !typeofmaterial || !grossweight || !tareweight || !netweight) {
+        toast.error('All field required', {
+          duration: 3000, // 3000 milliseconds (3 seconds)
+        });
+        return false;
+      }
       setLoader(true);
       const formdata = new FormData();
       formdata.append('supply_id', supplyid);
       formdata.append('trno', trno);
       formdata.append('vehicleno', vehicleno);
-      formdata.append('datein', formattedDatein);
-      formdata.append('timein', formattedTimein);
-      formdata.append('dateout', formattedDateout);
-      formdata.append('timeout', formattedTimeout);
+      if (!isvehicleapi) {
+        formdata.append('datein', formattedDate_in);
+        formdata.append('timein', formattedTime_in);
+        formdata.append('dateout', formattedDate_out);
+        formdata.append('timeout', formattedTime_out);
+      } else {
+        formdata.append('datein', formattedDatein);
+        formdata.append('timein', formattedTimein);
+        formdata.append('dateout', formattedDateout);
+        formdata.append('timeout', formattedTimeout);
+      }
       formdata.append('typeofmaterial', typeofmaterial);
       formdata.append('grossweight', grossweight);
       formdata.append('tareweight', tareweight);
@@ -290,7 +304,7 @@ const InvoiceList = () => {
           console.error('Error fetching data:', error);
         });
     }
-    
+
     const [statusOptions, setstatusOptions] = useState([
       { value: "", label: "" },
     ]);
@@ -407,7 +421,7 @@ const InvoiceList = () => {
       {
         options: aadharlist
       }
-    ]    
+    ]
     return (
       <div className='invoice-list-table-header w-100 py-2'>
         <Row>
@@ -453,7 +467,7 @@ const InvoiceList = () => {
               <div className='text-center mb-2'>
                 <h1 className='mb-1'>New Slip</h1>
               </div>
-              <Row tag='form' className='gy-1 pt-75' onSubmit={handleSubmit(onSubmit)}>
+              <Row tag='form' className='gy-1 pt-75'>
                 <Row>
                   <Col sm='12' md='12' xl='12'>
                     <Row >
@@ -507,14 +521,14 @@ const InvoiceList = () => {
                           Party Address
                         </Label>
                         <input
-                        disabled
+                          disabled
                           type='text'
                           name='partyaadharnumber' // Add a name prop to match your form structure if needed
                           id='partyaadharnumber'
                           placeholder=''
                           className='custom-input-class form-control'
                           style={{ fontSize: '16px' }}
-                        value={partyaddress}
+                          value={partyaddress}
                         />
 
                       </Col>
@@ -523,7 +537,7 @@ const InvoiceList = () => {
                           Remarks
                         </Label>
                         <input
-                        disabled
+                          disabled
                           type='text'
                           name='partyaadharnumber' // Add a name prop to match your form structure if needed
                           id='partyaadharnumber'
@@ -549,8 +563,8 @@ const InvoiceList = () => {
                       placeholder=''
                       className='custom-input-class form-control'
                       style={{ fontSize: '16px' }}
-                    value={trno}
-                    onChange={(e) => settrno(e.target.value)}
+                      value={trno}
+                      onChange={(e) => settrno(e.target.value)}
                     />
                   </Col>
                   <Col md={4} xs={4} className='py-2'>
@@ -564,23 +578,23 @@ const InvoiceList = () => {
                       placeholder=''
                       className='custom-input-class form-control'
                       style={{ fontSize: '16px' }}
-                    value={vehicleno}
-                    onChange={(e) => setvehicleno(e.target.value)}
+                      value={vehicleno}
+                      onChange={(e) => setvehicleno(e.target.value)}
                     />
                   </Col>
                   <Col md={4} xs={4} className='py-2'>
-                  <Label className='form-label d-block' for='productprice'>
+                    <Label className='form-label d-block' for='productprice'>
                       For Auto Fill
-                  </Label>
-                  {getvehicleapiloader ? (
-                    <Button type='button' disabled className='me-1 w-100' color='primary'>
-                      Loading ...
-                    </Button>
-                  ):(
-                    <Button type='button' onClick={getvehicleapi} className='me-1 w-100' color='primary'>
-                    Get Data
-                  </Button>
-                  )}
+                    </Label>
+                    {getvehicleapiloader ? (
+                      <Button type='button' disabled className='me-1 w-100' color='primary'>
+                        Loading ...
+                      </Button>
+                    ) : (
+                      <Button type='button' onClick={getvehicleapi} className='me-1 w-100' color='primary'>
+                        Get Data
+                      </Button>
+                    )}
                   </Col>
                   <Col md={3} xs={3} className='py-2'>
                     <Label className='form-label' for='productprice'>
@@ -593,8 +607,8 @@ const InvoiceList = () => {
                       placeholder=''
                       className='custom-input-class form-control'
                       style={{ fontSize: '16px' }}
-                    value={typeofmaterial}
-                    onChange={(e) => settypeofmaterial(e.target.value)}
+                      value={typeofmaterial}
+                      onChange={(e) => settypeofmaterial(e.target.value)}
                     />
                   </Col>
                   <Col md={3} xs={3} className='py-2'>
@@ -608,8 +622,8 @@ const InvoiceList = () => {
                       placeholder=''
                       className='custom-input-class form-control'
                       style={{ fontSize: '16px' }}
-                    value={grossweight}
-                    onChange={(e) => setgrossweight(e.target.value)}
+                      value={grossweight}
+                      onChange={(e) => setgrossweight(e.target.value)}
                     />
                   </Col>
                   <Col md={3} xs={3} className='py-2'>
@@ -623,8 +637,8 @@ const InvoiceList = () => {
                       placeholder=''
                       className='custom-input-class form-control'
                       style={{ fontSize: '16px' }}
-                    value={tareweight}
-                    onChange={(e) => settareweight(e.target.value)}
+                      value={tareweight}
+                      onChange={(e) => settareweight(e.target.value)}
                     />
                   </Col>
                   <Col md={3} xs={3} className='py-2'>
@@ -638,12 +652,12 @@ const InvoiceList = () => {
                       placeholder=''
                       className='custom-input-class form-control'
                       style={{ fontSize: '16px' }}
-                    value={netweight}
-                    onChange={(e) => setnetweight(e.target.value)}
+                      value={netweight}
+                      onChange={(e) => setnetweight(e.target.value)}
                     />
                   </Col>
                   <Col md={6} xs={6} className='py-2'>
-                    <Label  className='form-label' for='productprice'>
+                    <Label className='form-label' for='productprice'>
                       Date & Time In
                     </Label>
                     <input
@@ -655,31 +669,31 @@ const InvoiceList = () => {
                   </Col>
                   <Col md={6} xs={6} className='py-2'>
                     <Label className='form-label' for='productprice'>
-                    Date & Time Out
+                      Date & Time Out
                     </Label>
                     <Flatpickr
-                        value={pickerout}
-                        data-enable-time
-                        id='date-time-picker'
-                        className='form-control'
-                        onChange={date => setPickerout(date)}
-                      />
+                      value={pickerout}
+                      data-enable-time
+                      id='date-time-picker'
+                      className='form-control'
+                      onChange={date => setPickerout(date)}
+                    />
                   </Col>
                 </Row>
                 <Row>
 
                 </Row>
                 <Col xs={12} className='text-center mt-2 pt-50'>
-                  {loader ?(
+                  {loader ? (
                     <Button disabled type='button' className='me-1' color='primary'>
-                    Loading...
-                  </Button>  
-                  ):(
-                    <Button type='submit' className='me-1' color='primary'>
-                    Submit
-                  </Button>
+                      Loading...
+                    </Button>
+                  ) : (
+                    <Button type='button' onClick={submitslip} className='me-1' color='primary'>
+                      Submit
+                    </Button>
                   )}
-                  
+
                   <Button type='reset' color='secondary' outline onClick={() => setShow(false)}>
                     Discard
                   </Button>
