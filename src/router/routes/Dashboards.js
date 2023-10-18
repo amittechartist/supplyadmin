@@ -6,6 +6,7 @@ const Catagory = lazy(() => import('../../views/catagory'))
 const Payoutcustomer = lazy(() => import('../../views/payoutcustomer'))
 const Product = lazy(() => import('../../views/product'))
 const Payments = lazy(() => import('../../views/payments'))
+const Ewaybillgenerate = lazy(() => import('../../views/ewaybillgenerate'))
 
 const DashboardRoutes = [
   // {
@@ -36,6 +37,11 @@ const DashboardRoutes = [
     path: app_url+'/payments',
     element: <Payments />
   }, 
+  {
+    path: app_url+'/ewaybillgenerate',
+    element: <Ewaybillgenerate />
+  }, 
+
 ]
 
 export default DashboardRoutes

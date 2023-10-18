@@ -29,4 +29,10 @@ export default [
     icon: <Plus size={20} />,
     navLink: app_url+'/payments',
   },
+  {
+    id: 'ewaybillgenerate',
+    title: 'ewaybillgenerate',
+    icon: <Plus size={20} />,
+    navLink: app_url+'/ewaybillgenerate',
+  },
 ]
