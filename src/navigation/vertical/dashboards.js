@@ -31,8 +31,14 @@ export default [
   },
   {
     id: 'ewaybillgenerate',
-    title: 'ewaybillgenerate',
+    title: 'E-Way Bill',
     icon: <Plus size={20} />,
     navLink: app_url+'/ewaybillgenerate',
+  },
+  {
+    id: 'ewaybillgeneratelist',
+    title: 'E-Way Bill List',
+    icon: <Plus size={20} />,
+    navLink: app_url+'/ewaybilllist',
   },
 ]

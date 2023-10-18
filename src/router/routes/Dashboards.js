@@ -7,7 +7,7 @@ const Payoutcustomer = lazy(() => import('../../views/payoutcustomer'))
 const Product = lazy(() => import('../../views/product'))
 const Payments = lazy(() => import('../../views/payments'))
 const Ewaybillgenerate = lazy(() => import('../../views/ewaybillgenerate'))
-
+const Ewaybilllist = lazy(() => import('../../views/ewaybillgenerate/list'))
 const DashboardRoutes = [
   // {
   //   path: '/dashboard/analytics',
@@ -40,6 +40,10 @@ const DashboardRoutes = [
   {
     path: app_url+'/ewaybillgenerate',
     element: <Ewaybillgenerate />
+  }, 
+  {
+    path: app_url+'/ewaybilllist',
+    element: <Ewaybilllist />
   }, 
 
 ]
