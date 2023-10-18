@@ -645,45 +645,9 @@ const InvoiceList = () => {
     return result.trim();
   };
   function Handelpaynow(){
-    if(!partyId || !partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpayment_typeid){
-      toast.error("All field required");
-    }else{
-      Setloader(true);
-      const formdata = new FormData();
-    formdata.append('partyid', partyId);
-    formdata.append('partyname', partyname);
-    formdata.append('partyaadharnumber', partyaadharnumber);
-    formdata.append('partyphonenumber', partyphonenumber);
-    formdata.append('accountid', accountid);
-    formdata.append('amount', amount);
-    formdata.append('selectpayment_typeid', selectpayment_typeid);
-    fetch(local_api_url + 'payment_handel', {
-      method: 'POST',
-      body: formdata,
-    })
-      .then(response => response.json())
-      .then(data => {
-        Setloader(false);
-        // Check if the upload was successful based on your API response
-        if (data.status_code == 200) {
-          setShow(false);
-          setupdateshow(false)
-          // Display a success toast that auto-closes after 3 seconds
-          toast.success('Money transfer successful', {
-            duration: 3000, // 3000 milliseconds (3 seconds)
-          });
-          fetchData();
-        } else if(data.status_code == 400) {
-          // Display an error toast if the API response indicates an error
-          toast.error(data.response);
-        }
-      })
-      .catch(error => {
-        // Display an error toast for network errors or other issues
-        toast.error('Upload error: ' + error.message);
-        console.error('Upload error:', error);
-      });   
-    }
+    toast.error('Something went wrong with API request', {
+      duration: 3000, // 3000 milliseconds (3 seconds)
+    });
   }
   const Converttext = val => {
     const number = val;
