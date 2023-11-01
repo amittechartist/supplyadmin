@@ -78,14 +78,6 @@ const InvoiceList = () => {
   const [defaultValues, setdefaultValues] = useState({ categoryid: '', categoryname: '', categoryimage: '' });
   const CustomHeader = ({ value, handlePerPage, rowsPerPage }) => {
     //formcode
-    const [id, setid] = useState();
-    const [categoryname, setcategoryname] = useState();
-    const [categoryimage, setcategoryimage] = useState();
-    const [partyname, setpartyname] = useState();
-    const [partyaadharnumber, setpartyaadharnumber] = useState();
-    const [partyphonenumber, setpartyphonenumber] = useState();
-    const [partyaddress, setpartyaddress] = useState();
-    const [remarks, setremarks] = useState();
     const [partyaccountnumber, setpartyaccountnumber] = useState([]);
     const [partyifsccode, setpartyifsccode] = useState([]);
     const accountDetails = [];
@@ -93,41 +85,6 @@ const InvoiceList = () => {
       accountNumber: partyaccountnumber,
       ifscCode: partyifsccode,
     });
-    const onsubmit = (e) => {
-      e.preventDefault();
-      const formdata = new FormData();
-      formdata.append('id', id);
-      formdata.append('name', partyname);
-      formdata.append('aadhar_no', partyaadharnumber);
-      formdata.append('phone_number', partyphonenumber);
-      formdata.append('address', partyaddress);
-      formdata.append('remark', remarks);
-      formdata.append('accountdetails', JSON.stringify(accountDetails));
-      fetch(local_api_url + 'supplier_form_store', {
-        method: 'POST',
-        body: formdata,
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Check if the upload was successful based on your API response
-          if (data) {
-            // Display a success toast that auto-closes after 3 seconds
-            toast.success('Updated successfully', {
-              duration: 3000, // 3000 milliseconds (3 seconds)
-            });
-            fetchData();
-          } else {
-            // Display an error toast if the API response indicates an error
-            toast.error('Upload failed');
-          }
-        })
-        .catch(error => {
-          // Display an error toast for network errors or other issues
-          toast.error('Upload error: ' + error.message);
-          console.error('Upload error:', error);
-        });
-    };
-
     const [inputSets, setInputSets] = useState([]);
 
     const handleAddInputSet = () => {
@@ -215,10 +172,10 @@ const InvoiceList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusValue, setStatusValue] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [fetchedData, setFetchedData] = useState([]); // New state to hold fetched data
+  const [fetchedData, setFetchedData] = useState([]);
   const fetchData = async () => {
     try {
-      const response = await fetch(local_api_url + 'supplier_form_list', {
+      const response = await fetch(local_api_url + 'eway_bill_list', {
         method: 'GET',
         // You can add headers if needed
       });
@@ -228,7 +185,7 @@ const InvoiceList = () => {
       }
 
       const data = await response.json();
-    //   setFetchedData(data);
+      setFetchedData(data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -269,63 +226,61 @@ const InvoiceList = () => {
       name: 'Id',
       sortable: true,
       sortField: 'id',
-      minWidth: '107px',
+      minWidth: '30px',
       cell: (row, key) => {
         const keyToDisplay = key; // Use the provided key directly
-        return <Link to={`/apps/invoice/preview/${keyToDisplay}`}>{`${keyToDisplay + 1}`}</Link>;
+        
+        return(
+          <h6 className='user-name text-truncate mb-0'>{`${keyToDisplay + 1}`}</h6>
+        )
       }
     },
     {
-      name: 'FROM GST No',
+      name: 'FROM Name',
       sortable: true,
       minWidth: '350px',
       sortField: 'category.name',
       // selector: row => row.client.name,
       cell: row => {
-        const name = row.name ? row.name : 'John Doe';
         return (
           <div className='d-flex justify-content-left align-items-center'>
             {/* renderClient(row) - Not sure what renderClient does */}
             <div className='d-flex flex-column'>
-              <h6 className='user-name text-truncate mb-0'>{name}</h6>
+              <h6 className='user-name text-truncate mb-0'>{row.from_name}</h6>
             </div>
           </div>
         );
       }
     },
     {
-      name: 'To GST No',
+      name: 'To Name',
       sortable: true,
       minWidth: '150px',
       sortField: 'pphoto.name',
       // selector: row => row.client.name,
       cell: row => {
-
-        const categoryimage = row.aadhar_no ? row.aadhar_no : 'categoryimage';
         return (
           <div className='d-flex justify-content-left align-items-center'>
             {/* renderClient(row) - Not sure what renderClient does */}
             <div className='d-flex flex-column'>
-              <h6 className='user-name text-truncate mb-0'>{row.aadhar_no}</h6>
+              <h6 className='user-name text-truncate mb-0'>{row.to_name}</h6>
             </div>
           </div>
         );
       }
     },
     {
-      name: 'Bill Date',
+      name: 'Generated Date',
       sortable: true,
       minWidth: '150px',
       sortField: 'pphoto.name',
       // selector: row => row.client.name,
       cell: row => {
-
-        const categoryimage = row.phone_number ? row.phone_number : 'categoryimage';
         return (
           <div className='d-flex justify-content-left align-items-center'>
             {/* renderClient(row) - Not sure what renderClient does */}
             <div className='d-flex flex-column'>
-              <h6 className='user-name text-truncate mb-0'>{row.phone_number}</h6>
+              <h6 className='user-name text-truncate mb-0'>{row.generated_date}</h6>
             </div>
           </div>
         );
@@ -388,23 +343,7 @@ const InvoiceList = () => {
     setSortColumn(column.sortField);
     // Fetch data here with new sort parameters
   };
-
-  const [partyId, setpartyId] = useState();
-  const [partyname, setpartyname] = useState();
-  const [partyaadharnumber, setpartyaadharnumber] = useState();
-  const [partyphonenumber, setpartyphonenumber] = useState();
-  const [partyaddress, setpartyaddress] = useState();
-  const [remarks, setremarks] = useState();
-  const [createddate, setcreateddate] = useState();
-  const [accountid, setAccountid] = useState();
-  const [amount, setAmount] = useState();
-  const [amountinword, setAmountinword] = useState();
   const [formaccount, setFormaccount] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [paymentOption, setPaymentOption] = useState(null);
-  const [selectpayment_typeid, setSelectpayment_typeid] = useState(null);
-  const [loader, Setloader] = useState(false);
-
   function viewdetails(id) {
     fetch(local_api_url + 'supplier_form_get/' + id, {
       method: 'GET'
@@ -521,47 +460,7 @@ const InvoiceList = () => {
   
     return result.trim();
   };
-  function Handelpaynow(){
-    if(!partyId || !partyname || !partyaadharnumber || !partyphonenumber || !accountid || !amount || !selectpayment_typeid){
-      toast.error("All field required");
-    }else{
-      Setloader(true);
-      const formdata = new FormData();
-    formdata.append('partyid', partyId);
-    formdata.append('partyname', partyname);
-    formdata.append('partyaadharnumber', partyaadharnumber);
-    formdata.append('partyphonenumber', partyphonenumber);
-    formdata.append('accountid', accountid);
-    formdata.append('amount', amount);
-    formdata.append('selectpayment_typeid', selectpayment_typeid);
-    fetch(local_api_url + 'payment_handel', {
-      method: 'POST',
-      body: formdata,
-    })
-      .then(response => response.json())
-      .then(data => {
-        Setloader(false);
-        // Check if the upload was successful based on your API response
-        if (data.status_code == 200) {
-          setShow(false);
-          setupdateshow(false)
-          // Display a success toast that auto-closes after 3 seconds
-          toast.success('Money transfer successful', {
-            duration: 3000, // 3000 milliseconds (3 seconds)
-          });
-          fetchData();
-        } else if(data.status_code == 400) {
-          // Display an error toast if the API response indicates an error
-          toast.error(data.response);
-        }
-      })
-      .catch(error => {
-        // Display an error toast for network errors or other issues
-        toast.error('Upload error: ' + error.message);
-        console.error('Upload error:', error);
-      });   
-    }
-  }
+  
   const Converttext = val => {
     const number = val;
     const words = ConvertNumberToWords(number);
@@ -692,192 +591,7 @@ const InvoiceList = () => {
     padding: '9px 8px',
   };
   return (
-
     <div className='invoice-list-wrapper'>
-      <Modal isOpen={show} toggle={() => setShow(!show)} className='modal-dialog-centered modal-lg'>
-            <ModalHeader className='bg-transparent' toggle={() => setShow(!show)}></ModalHeader>
-            <ModalBody className='px-sm-5 mx-50 pb-5'>
-              <div className='text-center mb-2'>
-                <h1 className='mb-1'>Payment</h1>
-              </div>
-              <form enctype="multipart/form-data" onSubmit={onsubmit}>
-                <Row>
-                  <Col md={4} className='mb-2'>
-                    <Label className='form-label' for='categoryname'>
-                      Party Name
-                    </Label>
-                    <input
-                      name='partyname' // Add a name prop to match your form structure if needed
-                      id='partyname'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyname}
-                      disabled
-                    />
-                  </Col>
-                  <Col md={4} className='mb-2'>
-                    <Label className='form-label' for='categoryname'>
-                      Party Aadhar Number
-                    </Label>
-                    <input
-                      name='partyname' // Add a name prop to match your form structure if needed
-                      id='partyname'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyaadharnumber}
-                      disabled
-                    />
-                  </Col>
-                  <Col md={4} className='mb-2'>
-                    <Label className='form-label' for='categoryname'>
-                      Party Phone Number
-                    </Label>
-                    <input
-                      name='partyname' // Add a name prop to match your form structure if needed
-                      id='partyname'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={partyphonenumber}
-                      disabled
-                    />
-                  </Col>
-                  <Col md={6} className='mb-2'>
-                  <Label className='form-label' for='status'>
-                          Select Bank Account
-                        </Label>
-                        <Select
-                          isClearable={false}
-                          theme={selectThemeColors}
-                          options={groupedOptions}
-                          className='react-select'
-                          classNamePrefix='select'
-                          onChange={issuedata}
-                          value={selectedOption}
-                        />
-                  </Col>
-                  <Col md={6} className='mb-2'>
-                  <Label className='form-label' for='status'>
-                          Payment Type
-                        </Label>
-                        <Select
-                          isClearable={false}
-                          theme={selectThemeColors}
-                          options={paymenttype}
-                          className='react-select'
-                          classNamePrefix='select'
-                          onChange={ispaymenttype}
-                          value={paymentOption}
-                        />
-                  </Col>
-                  <Col md={6} className='mb-2'>
-                  <Label className='form-label' for='categoryname'>
-                      Enter Amount
-                    </Label>
-                    <input
-                      name='amount' // Add a name prop to match your form structure if needed
-                      id='amount'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={amount}
-                      onChange={e => Converttext(e.target.value)}
-                    />
-                  </Col>
-                  <Col md={6} className='mb-2'>
-                  <Label className='form-label' for='categoryname'>
-                      In Word
-                    </Label>
-                    <input
-                      name='amount' // Add a name prop to match your form structure if needed
-                      id='amount'
-                      placeholder=''
-                      className='custom-input-class form-control'
-                      style={{ fontSize: '16px' }}
-                      value={amountinword}
-                      disabled
-                    />
-                  </Col>
-                  <Col md={12}>
-                  {loader ?(
-                      <Button color='success' disabled type='button'>Loading...</Button>
-                    ):(
-                      <Button color='success' onClick={Handelpaynow}>Pay Now</Button>
-                    )}
-                  </Col>
-                </Row>
-              </form>
-            </ModalBody>
-          </Modal>
-      <Modal isOpen={infoshow} toggle={() => setInfoshow(!infoshow)} className='modal-dialog-centered modal-lg'>
-        <ModalHeader className='bg-transparent' toggle={() => setInfoshow(!infoshow)}></ModalHeader>
-        <ModalBody className='px-sm-5 mx-50 pb-5'>
-          <div className='text-center mb-2'>
-            <h1 className='mb-1'>Supplier Form</h1>
-          </div>
-          <Row className='gy-1 pt-75'>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>
-                Party Name
-              </Label>
-              <div>
-                <h5 style={modalShowDataStyle}>{partyname}</h5>
-              </div>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>
-                Party Aadhar Number
-              </Label>
-              <h5 style={modalShowDataStyle}>{partyaadharnumber}</h5>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>
-                Party Phone Number
-              </Label>
-              <h5 style={modalShowDataStyle}>{partyphonenumber}</h5>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>
-                Party Address
-              </Label>
-              <h5 style={modalShowDataStyle}>{partyaddress}</h5>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>
-                Remarks
-              </Label>
-              <h5 style={modalShowDataStyle}>{remarks}</h5>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>
-                Created Date
-              </Label>
-              <h5 style={modalShowDataStyle}>{createddate}</h5>
-            </Col>
-            <Col xs={12}>
-              <h3>Account details</h3>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>Account Number</Label>
-            </Col>
-            <Col xs={6}>
-              <Label className='form-label' for='categoryname'>IFSC Code</Label>
-            </Col>
-            {formaccount.map((items, index) => (
-              <>
-                <Col xs={6}>
-                  <h5 style={modalShowDataStyle}>{items.account_no}</h5>
-                </Col>
-                <Col xs={6}>
-                  <h5 style={modalShowDataStyle}>{items.ifsc}</h5>
-                </Col>
-              </>
-            ))}
-          </Row>
-        </ModalBody>
-      </Modal>
       <Card>
         <div className='invoice-list-dataTable react-dataTable '>
           <DataTable

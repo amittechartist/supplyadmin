@@ -86,49 +86,7 @@ const InvoiceList = () => {
     const [partyphonenumber, setpartyphonenumber] = useState();
     const [partyaddress, setpartyaddress] = useState();
     const [remarks, setremarks] = useState();
-    const [partyaccountnumber, setpartyaccountnumber] = useState([]);
-    const [partyifsccode, setpartyifsccode] = useState([]);
-    const accountDetails = [];
-    accountDetails.push({
-      accountNumber: partyaccountnumber,
-      ifscCode: partyifsccode,
-    });
-    const onsubmit = (e) => {
-      e.preventDefault();
-      const formdata = new FormData();
-      formdata.append('id', id);
-      formdata.append('name', partyname);
-      formdata.append('aadhar_no', partyaadharnumber);
-      formdata.append('phone_number', partyphonenumber);
-      formdata.append('address', partyaddress);
-      formdata.append('remark', remarks);
-      formdata.append('accountdetails', JSON.stringify(accountDetails));
-      fetch(local_api_url + 'supplier_form_store', {
-        method: 'POST',
-        body: formdata,
-      })
-        .then(response => response.json())
-        .then(data => {
-          // Check if the upload was successful based on your API response
-          if (data) {
-            // Display a success toast that auto-closes after 3 seconds
-            toast.success('Updated successfully', {
-              duration: 3000, // 3000 milliseconds (3 seconds)
-            });
-            fetchData();
-          } else {
-            // Display an error toast if the API response indicates an error
-            toast.error('Upload failed');
-          }
-        })
-        .catch(error => {
-          // Display an error toast for network errors or other issues
-          toast.error('Upload error: ' + error.message);
-          console.error('Upload error:', error);
-        });
-    };
-
-   
+  
     return (
       <div className='invoice-list-table-header w-100 py-2'>
         <Row>
@@ -172,11 +130,6 @@ const InvoiceList = () => {
         </Row>
       </div>
     )
-    function handleInputChange(index, field, value) {
-      const updatedInputSets = [...inputSets];
-      updatedInputSets[index][field] = value;
-      setInputSets(updatedInputSets);
-    }
   }
   // ** States
   const [show, setShow] = useState(false)
@@ -390,7 +343,7 @@ const InvoiceList = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [paymentOption, setPaymentOption] = useState(null);
   const [selectpayment_typeid, setSelectpayment_typeid] = useState(null);
-  const [loader, Setloader] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   // api form state
   const [supplytypeoption, setSupplytypeoption] = useState(null);
@@ -447,8 +400,7 @@ const InvoiceList = () => {
   const [vehicleNo, SetvehicleNo] = useState();
   const [productName, SetproductName] = useState();
   const [productDesc, SetproductDesc] = useState();
-  const [hsnCode, SethsnCode] = useState();
-  const [quantity, Setquantity] = useState();
+  
   const [taxableAmount, SettaxableAmount] = useState();
   const [sgstRate, SetsgstRate] = useState();
   const [cgstRate, SetcgstRate] = useState();
@@ -460,7 +412,23 @@ const InvoiceList = () => {
   const [ApproxDistance, setApproxDistance] = useState();  
   const [CEWBno, setCEWBno] = useState();  
 
+  const [hsncode, SethsnCode] = useState([]);
+  const [paymentname, setpaymentname] = useState([]);
+  const [quantity, setquantity] = useState([]);
+  const [taxable_amount, settaxable_amount] = useState([]);
+  const [taxrate, settaxrate] = useState([]);
+
   const accountDetails = [];
+
+  if(hsncode.length > 0 && paymentname.length > 0 && quantity.length > 0 && taxable_amount.length > 0 && taxrate.length > 0){
+    accountDetails.push({
+        hsnCode: hsncode,
+        paymentName: paymentname,
+        Quantity: quantity,
+        taxableAmount: taxable_amount,
+        taxRate: taxrate,
+    });
+  }
 
   const [inputSets, setInputSets] = useState([]);
 
@@ -468,30 +436,40 @@ const InvoiceList = () => {
     setInputSets([
       ...inputSets,
       {
-        partyaccountnumber: '',
-        partyifsccode: '',
+        hsncode: '',
+        paymentname: '',
+        quantity: '',
+        taxable_amount: '',
+        taxrate: '',
       },
     ]);
   };
+
+  function handleInputChange(index, field, value) {
+    const updatedInputSets = [...inputSets];
+    updatedInputSets[index][field] = value;
+    setInputSets(updatedInputSets);
+  }
 
   const handleDeleteInputSet = (index) => {
     const updatedInputSets = [...inputSets];
     updatedInputSets.splice(index, 1);
     setInputSets(updatedInputSets);
   };
+
   inputSets.forEach((inputSet) => {
-    accountDetails.push({
-      accountNumber: inputSet.partyaccountnumber,
-      ifscCode: inputSet.partyifsccode,
-    });
+    if(inputSet.hsncode.length > 0  && inputSet.paymentname.length > 0 && inputSet.quantity.length > 0 && inputSet.taxable_amount.length > 0 && inputSet.taxrate.length > 0){
+      accountDetails.push({
+        hsnCode: inputSet.hsncode,
+        paymentName: inputSet.paymentname,
+        Quantity: inputSet.quantity,
+        taxableAmount: inputSet.taxable_amount,
+        taxRate: inputSet.taxrate,
+      });
+    }
   });
 
-  console.log(inputSets);
-  
-  
-  
-
-  
+  console.log(inputSets);  
 
   const issetstatecode = (selectedValue) => {
     setstatecodeovalue(selectedValue);
@@ -650,10 +628,98 @@ const InvoiceList = () => {
   
     return result.trim();
   };
-  function Handelpaynow(){
-    toast.error('Something went wrong with API request', {
-      duration: 3000, // 3000 milliseconds (3 seconds)
-    });
+  function HandelEwaybillForm(){
+    
+    if(!Ewaybillno ||!Mode ||!Generatedby ||!supplytype ||!ApproxDistance ||!transactiontypevalue_id ||!fromTrdName ||!fromGstin ||!fromAddr1 ||!frompincode ||!statecodeovalue_id ||!toTrdName ||!toGstin ||!toAddr1 ||!topincode ||!tostatecodevalue_id ||!transporterName ||!transporterId ||!transDocNo ||!transDocDate ||!vehicleNo ||!fromPlace || !CEWBno){
+      toast.error('All field required');
+      return false;
+    }
+    if(!accountDetails.length > 0){
+      toast.error('Enter product details', {
+        duration: 3000, // 3000 milliseconds (3 seconds)
+      });
+      return false;
+    }
+    setLoader(true);
+    const formdata = new FormData();
+    formdata.append('ewaybillno',Ewaybillno);
+    formdata.append('mode',Mode);
+    formdata.append('generatedby',Generatedby);
+    formdata.append('supply_type',supplytype);
+    formdata.append('approx_distance',ApproxDistance);
+    formdata.append('transaction_type',transactiontypevalue_id);
+    formdata.append('from_name',fromTrdName);
+    formdata.append('from_gst',fromGstin);
+    formdata.append('from_address',fromAddr1);
+    formdata.append('from_pincode',frompincode);
+    formdata.append('from_state',statecodeovalue_id);
+    formdata.append('to_name',toTrdName);
+    formdata.append('to_gst',toGstin);
+    formdata.append('to_address',toAddr1);
+    formdata.append('to_pincode',topincode);
+    formdata.append('to_state',tostatecodevalue_id);
+    formdata.append('transporter_name',transporterName);
+    formdata.append('transporter_id',transporterId);
+    formdata.append('transporter_doc_no',transDocNo);
+    formdata.append('transporter_date',transDocDate);
+    formdata.append('vehicle_no',vehicleNo);
+    formdata.append('vehicle_place',fromPlace);
+    formdata.append('cewb_no',CEWBno);
+    formdata.append('product_details', JSON.stringify(accountDetails));
+    fetch(local_api_url + 'eway_bill_insert', {
+      method: 'POST',
+      body: formdata,
+    })
+      .then(response => response.json())
+      .then(data => {
+        setLoader(false);
+        if (data.status_code == 201) {
+          toast.success(data.message, {
+            duration: 3000,
+          });
+          EmptyState();
+        } else if(data.status_code == 400) {
+          toast.error(data.message);
+        }else{
+          toast.error('Server Issue');
+        }
+      })
+      .catch(error => {
+        setLoader(false);
+        // Display an error toast for network errors or other issues
+        toast.error('Insert error: ' + error.message);
+        console.error('Insert error:', error);
+      });
+  }
+  function EmptyState(){
+    setEwaybillno('');
+    setMode('');
+    setGeneratedby('');
+    setApproxDistance('');
+    setFromTrdName('');
+    setFromGstin('');
+    setfromAddr1('');
+    setfrompincode('');
+    setToTrdName('');
+    settoGstin('');
+    settoAddr1('');
+    settopincode('');
+    SettransporterName('');
+    SettransporterId('');
+    SettransDocNo('');
+    SettransDocDate('');
+    SetvehicleNo('');
+    setfromPlace('');
+    setCEWBno('');
+    setInputSets([]);
+    setSupplytypeoption('');
+    setSupplytype('');
+    setstatecodeovalue('');
+    setstatecodeovalueid('');
+    settostatecodevalue('');
+    settostatecodevalueid('');
+    settransactiontypevalue('');
+    settransactiontypevalueid('');
   }
   const Converttext = val => {
     const number = val;
@@ -1206,46 +1272,66 @@ const InvoiceList = () => {
             <Col md={2} className='mb-2'>
                 <input
                 name='' // Add a name prop to match your form structure if needed
-                id=''
+                id={`hsncode_${index}`}
                 placeholder=''
                 className='custom-input-class form-control'
                 style={{ fontSize: '16px' }}
+                value={inputSet.hsncode}
+                onChange={(e) =>
+                  handleInputChange(index, 'hsncode', e.target.value)
+                }
                 />
             </Col>
             <Col md={3} className='mb-2'>
                 <input
                 name='' // Add a name prop to match your form structure if needed
-                id=''
+                id={`paymentname_${index}`}
                 placeholder=''
                 className='custom-input-class form-control'
                 style={{ fontSize: '16px' }}
+                value={inputSet.paymentname}
+                onChange={(e) =>
+                  handleInputChange(index, 'paymentname', e.target.value)
+                }
                 />
             </Col>
             <Col md={2} className='mb-2'>
                 <input
                 name='' // Add a name prop to match your form structure if needed
-                id=''
+                id={`quantity_${index}`}
                 placeholder=''
                 className='custom-input-class form-control'
                 style={{ fontSize: '16px' }}
+                value={inputSet.quantity}
+                onChange={(e) =>
+                  handleInputChange(index, 'quantity', e.target.value)
+                }
                 />
             </Col>
             <Col md={2} className='mb-2'>
                 <input
                 name='' // Add a name prop to match your form structure if needed
-                id=''
+                id={`taxable_amount_${index}`}
                 placeholder=''
                 className='custom-input-class form-control'
                 style={{ fontSize: '16px' }}
+                value={inputSet.taxable_amount}
+                onChange={(e) =>
+                  handleInputChange(index, 'taxable_amount', e.target.value)
+                }
                 />
             </Col>
             <Col md={2} className='mb-2'>
                 <input
                 name='' // Add a name prop to match your form structure if needed
-                id=''
+                id={`taxrate_${index}`}
                 placeholder=''
                 className='custom-input-class form-control'
                 style={{ fontSize: '16px' }}
+                value={inputSet.taxrate}
+                onChange={(e) =>
+                  handleInputChange(index, 'taxrate', e.target.value)
+                }
                 />
             </Col>
             <Col md={1} className='mb-2'>
@@ -1361,7 +1447,7 @@ const InvoiceList = () => {
           {loader ?(
               <Button color='success' disabled type='button'>Loading...</Button>
             ):(
-              <Button color='success' onClick={Handelpaynow}>Submit</Button>
+              <Button color='success' onClick={HandelEwaybillForm}>Submit</Button>
             )}
           </Col>
         </Row>
