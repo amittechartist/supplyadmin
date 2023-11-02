@@ -173,6 +173,45 @@ const InvoiceList = () => {
   const [statusValue, setStatusValue] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [fetchedData, setFetchedData] = useState([]);
+  
+
+  
+  const printpdf = async (id) => {
+    try {
+      const response = await fetch(local_api_url + 'pdf_download/' + id, {
+        method: 'GET',
+        // You can add headers if needed
+        responseType: 'blob', // Set responseType to 'blob' to handle binary data
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // Check if the response headers contain the filename
+      const filename = response.headers.get('content-disposition');
+      const match = /filename="(.+)"/.exec(filename);
+      const suggestedFilename = match ? match[1] : 'download.pdf';
+  
+      const blob = await response.blob();
+  
+      // Create a URL for the blob and initiate the download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = suggestedFilename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+  
+      console.log('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+  
   const fetchData = async () => {
     try {
       const response = await fetch(local_api_url + 'eway_bill_list', {
@@ -292,7 +331,8 @@ const InvoiceList = () => {
       cell: row => (
         <div className='column-action d-flex align-items-center'>
           {/* <Edit onClick={() => editbutton(row.id)} className='cursor-pointer' size={15} /> */}
-          <Info onClick={() => { viewdetails(row.id) }} className='cursor-pointer' size={15} />
+          {/* <Info onClick={() => { viewdetails(row.id) }} className='cursor-pointer' size={15} /> */}
+          <Button onClick={() => printpdf(row.id)}>Print PDF</Button>
         </div>
       )
     }
